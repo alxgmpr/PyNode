@@ -9,6 +9,7 @@
 ####################################
 
 import sys
+import os
 import threading
 import select
 from time import sleep
@@ -61,6 +62,7 @@ class PyNode(threading.Thread):
             log('Awaiting config\n\nMenu:\n(0) - Username/password\n(1) - IP address\nPlease enter your selection:')
             try:
                 selection = int(raw_input('> '))
+                print
             except TypeError:
                 log('[error] Please enter 0 or 1')
             if selection in {0, 1}:
@@ -79,7 +81,6 @@ class PyNode(threading.Thread):
                     break
                 else:
                     log('[error] Please enter in format USERNAME:PASSWORD')
-
             self.username = user_pass.split(':')[0]
             self.password = user_pass.split(':')[1]
             return True
@@ -87,7 +88,7 @@ class PyNode(threading.Thread):
             self.is_ip_addr = True
             self.is_user_pass = False
             while True:
-                log('\nAwaiting config\n\nMenu:\n(0) - Fetch IP automatically\n(1) - Enter IPv4 manually\nPlease enter your selection:')
+                log('Awaiting config\n\nMenu:\n(0) - Fetch IP automatically\n(1) - Enter IPv4 manually\nPlease enter your selection:')
                 try:
                     selection = int(raw_input('> '))
                     print
@@ -137,7 +138,11 @@ class PyNode(threading.Thread):
         log('Selected type {}'.format(ltype.id))
 
         log('Creating VPS')
-        l, pw = client.linode.create_instance(ltype, region, image)
+        try:
+            l, pw = client.linode.create_instance(ltype, region, image)
+        except linode.ApiError:
+            log('[error] Invalid API key. Refer to readme')
+            sys.exit(-1)
         log('VPS Credentials: \n\nUsername: root\nPassword: {}\n'.format(pw))
         log('Booting VPS')
         log('Server IP: ' + str(l.ipv4[0]))
@@ -371,14 +376,42 @@ sudo htpasswd -b /etc/squid/squid_passwd {} {} """.format(self.username, self.pa
         self.ssh.close()
         log('\nSSH Tunnel complete and connection closed')
         return True
-    # def write_file(self):
+
+    def write_file(self):
+        log('Writing proxies to file')
+        print
+        i = 0
+        filename = 'proxies-{}.txt'.format(i)
+        while filename in os.listdir('/'):
+            i += 1
+        log('Proxies will be saved in {}'.format(filename))
+        with open(filename, 'w') as proxyfile:
+            if self.is_ip_addr:
+                for j in range(8000, 8050):
+                    proxyfile.write('{}:{}\n'.format(self.server_ip_addr, j))
+            elif self.is_user_pass:
+                for j in range(8000, 8050):
+                    proxyfile.write('{}:{}:{}:{}\n'.format(self.server_ip_addr, j, self.username, self.password))
+        log('Proxies successfully written to file')
 
     def run(self):
-        self.generate_linode()
-        self.configure()
-        # print self.build_commands()
-        self.connect()
-        self.execute()
+        while True:
+            log('How many servers would you like to create (50 proxies per server)?')
+            log('Different configuration can be used for each server\n')
+            try:
+                server_qty = int(raw_input('> '))
+            except TypeError:
+                log('[error] Please enter a number between 1 and 20')
+            if (server_qty < 1) or (server_qty > 20):
+                log('[error] Please enter a number between 1 and 20')
+            else:
+                break
+        for i in range(server_qty):
+            self.generate_linode()
+            self.configure()
+            self.connect()
+            self.execute()
+            self.write_file()
 
 
 def main():
