@@ -20,7 +20,10 @@ from datetime import datetime
 import urllib3
 import requests
 import paramiko
-import linode
+try:
+    import linode
+except ImportError:
+    import linode-api
 
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
