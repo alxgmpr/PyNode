@@ -15,6 +15,8 @@ added funds to your account, navigate to https://cloud.linode.com/profile/tokens
 Please note that this key is not the same as an API client key, or the traditional API key found on manager.linode.com.
 If you use the wrong key type the script will not work and you will run into authentication errors.
 
+The API key needs 'create' permissions for 'Linodes'. You can make up any name, it doesn't matter. The other permissions can be left alone.
+
 Save the API key secret in a textfile called ```apikey.txt```. The other configuration options will be prompted to you
 as the program runs.
 
