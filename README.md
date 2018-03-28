@@ -1,3 +1,5 @@
+![speed test example](https://raw.githubusercontent.com/alxgmpr/PyNode/master/proxy-speed-test.png)
+
 # PyNode
 **Version 0.2**
  
