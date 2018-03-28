@@ -129,7 +129,7 @@ class PyNode(threading.Thread):
                 sys.exit(-1)
         else:
             log('Please enter the IPv4 address you would like the proxies tied to:')
-            self.ip_addr = raw_input('> ')
+            self.ip_addr = str(raw_input('> '))
             print
             if len(self.ip_addr.split(':')) > 1:
                 log('[error] Got IPv6 address instead of IPv4')
