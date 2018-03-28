@@ -105,3 +105,9 @@ ENV/
 
 # PyCharm
 .idea/
+
+*.xml
+
+.idea/workspace.xml
+
+proxies*

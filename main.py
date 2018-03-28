@@ -8,6 +8,8 @@
 #    https://github.com/alxgmpr    #
 ####################################
 
+# v0.2
+
 import sys
 import os
 import threading
@@ -20,11 +22,14 @@ import requests
 import paramiko
 import linode
 
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
 def log(text):
-    print '[{}] :: {}'.format(datetime.strftime(datetime.now(), '%H:%M:%S'), text)
+    print('[{}] :: {}'.format(datetime.strftime(datetime.now(), '%H:%M:%S'), text))
 
 
 class PyNode(threading.Thread):
@@ -44,6 +49,8 @@ class PyNode(threading.Thread):
 
         self.ssh = paramiko.SSHClient()
         self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+
+        self.i = 0
 
         log('Importing Linode API key from apikey.txt')
         try:
@@ -87,40 +94,43 @@ class PyNode(threading.Thread):
         else:
             self.is_ip_addr = True
             self.is_user_pass = False
-            while True:
-                log('Awaiting config\n\nMenu:\n(0) - Fetch IP automatically\n(1) - Enter IPv4 manually\nPlease enter your selection:')
-                try:
-                    selection = int(raw_input('> '))
-                    print
-                except TypeError:
-                    log('[error] Please enter 0 or 1')
-                if selection in {0, 1}:
-                    break
-                else:
-                    log('[error] Please enter 0 or 1')
-            if selection == 0:
-                log('Retrieving local IPv4 address')
-                try:
-                    r = requests.get(
-                        url='https://httpbin.org/ip',
-                        verify=False,
-                        allow_redirects=False,
-                        timeout=5
-                    )
-                    r.raise_for_status()
-                except (requests.exceptions.HTTPError, requests.exceptions.Timeout):
-                    log('[error] Failed to retrieve local IPv4 address')
-                    sys.exit(-1)
-                j = r.json()
-                try:
-                    self.ip_addr = j['origin']
-                except KeyError:
-                    log('[error] Couldnt find IPv4 address in response')
-                    sys.exit(-1)
-            else:
-                log('Please enter the IPv4 address you would like the proxies tied to:')
-                self.ip_addr = raw_input('> ')
+
+        while True:
+            log(
+                'Awaiting config\n\nMenu:\n(0) - Fetch IP automatically\n(1) - Enter IPv4 manually\nPlease enter your selection:')
+            try:
+                selection = int(raw_input('> '))
                 print
+            except TypeError:
+                log('[error] Please enter 0 or 1')
+            if selection in {0, 1}:
+                break
+            else:
+                log('[error] Please enter 0 or 1')
+
+        if selection == 0:
+            log('Retrieving local IPv4 address')
+            try:
+                r = requests.get(
+                    url='https://httpbin.org/ip',
+                    verify=False,
+                    allow_redirects=False,
+                    timeout=5
+                )
+                r.raise_for_status()
+            except (requests.exceptions.HTTPError, requests.exceptions.Timeout):
+                log('[error] Failed to retrieve local IPv4 address')
+                sys.exit(-1)
+            j = r.json()
+            try:
+                self.ip_addr = j['origin']
+            except KeyError:
+                log('[error] Couldnt find IPv4 address in response')
+                sys.exit(-1)
+        else:
+            log('Please enter the IPv4 address you would like the proxies tied to:')
+            self.ip_addr = raw_input('> ')
+            print
             if len(self.ip_addr.split(':')) > 1:
                 log('[error] Got IPv6 address instead of IPv4')
                 sys.exit(-1)
@@ -336,13 +346,17 @@ EOF
 service squid restart
         """
         if self.is_user_pass:
-            config_snippet = """auth_param basic program /usr/lib/squid/basic_ncsa_auth /etc/squid/squid_passwd
-acl ncsa_users proxy_auth REQUIRED"""
+            config_snippet = """
+auth_param basic program /usr/lib/squid/basic_ncsa_auth /etc/squid/squid_passwd
+acl ncsa_users proxy_auth REQUIRED
+            """
 
-            end_snippet = """sudo touch /etc/squid/squid_passwd
+            end_snippet = """
+sudo touch /etc/squid/squid_passwd
 sudo chown proxy /etc/squid/squid_passwd
 
-sudo htpasswd -b /etc/squid/squid_passwd {} {} """.format(self.username, self.password)
+sudo htpasswd -b /etc/squid/squid_passwd {} {}
+            """.format(self.username, self.password)
 
             return command_template.format(config_snippet, end_snippet)
         elif self.is_ip_addr:
@@ -380,10 +394,11 @@ sudo htpasswd -b /etc/squid/squid_passwd {} {} """.format(self.username, self.pa
     def write_file(self):
         log('Writing proxies to file')
         print
-        i = 0
-        filename = 'proxies-{}.txt'.format(i)
-        while filename in os.listdir('/'):
-            i += 1
+        self.i = 0
+        filename = 'proxies-{}.txt'.format(self.i)
+        while filename in os.listdir('.'):
+            self.i += 1
+            filename = 'proxies-{}.txt'.format(self.i)
         log('Proxies will be saved in {}'.format(filename))
         with open(filename, 'w') as proxyfile:
             if self.is_ip_addr:
@@ -406,9 +421,9 @@ sudo htpasswd -b /etc/squid/squid_passwd {} {} """.format(self.username, self.pa
                 log('[error] Please enter a number between 1 and 20')
             else:
                 break
+        self.configure()
         for i in range(server_qty):
             self.generate_linode()
-            self.configure()
             self.connect()
             self.execute()
             self.write_file()
@@ -418,5 +433,7 @@ def main():
     pynode = PyNode()
     pynode.start()
 
+
 if __name__ == '__main__':
     main()
+
