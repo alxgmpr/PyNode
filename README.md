@@ -1,5 +1,4 @@
-![speed test example](https://raw.githubusercontent.com/alxgmpr/PyNode/master/proxy-speed-test.png?s=50)
-
+**Follow me on Twitter for future updates and other projects: [@edzart](https://twitter.com/edzart)**
 # PyNode
 **Version 0.2**
  
@@ -112,3 +111,6 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+
+![speed test example](https://raw.githubusercontent.com/alxgmpr/PyNode/master/proxy-speed-test.png?s=50)
