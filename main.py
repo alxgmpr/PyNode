@@ -59,6 +59,11 @@ class PyNode(threading.Thread):
                 if self.api_key in {None, ''}:
                     log('[error] Blank api key')
                     sys.exit(-1)
+                if len(self.api_key) > 64:
+                    log('[warning] It appears your api key is longer than 64 characters. Make sure you dont have'
+                        ' any extra spaces or new line characters in the apikey.txt file')
+                    log('Attempting to strip extra newline characters from apikey.txt')
+                    self.api_key = self.api_key.split('\n')[0]
         except IOError:
             log('[error] Unable to locate apikey.txt')
             sys.exit(-1)
