@@ -8,7 +8,7 @@ Every time the script is run, it generates 50 web proxies in the format of your 
 
 ## Configuration
 
-You must have a Linode account for this script to work. Once you have signed up with Linode and 
+You must have a Linode account for this script to work. [Sign up for Linode here](https://www.linode.com/?r=13d4952d7bf274cbc639640cb2b79788d43220a2). Once you have signed up with Linode and 
 added funds to your account, navigate to https://cloud.linode.com/profile/tokens, and generate a new API key.
 
 Please note that this key is not the same as an API client key, or the traditional API key found on manager.linode.com.
