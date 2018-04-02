@@ -48,6 +48,8 @@ they all work.
 These aren't rules, but more guidelines based on my experience scraping/botting Shopify over the past ~6 mos. You'll need
 to experiment and tweak your own set up
 
+[Guide and example setup.](https://gist.github.com/alxgmpr/936e36a9fc27c16b87d52d4e3d5f9d12)
+
 ## Notes
 
 * Linode accounts have a limit of 20 instances per account. 
