@@ -111,3 +111,11 @@ ENV/
 .idea/workspace.xml
 
 proxies*
+
+*.pyc
+.idea
+*.xml
+
+.idea/workspace.xml
+
+apikey.txt

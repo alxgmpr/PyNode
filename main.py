@@ -147,9 +147,9 @@ class PyNode(threading.Thread):
         client = linode.LinodeClient(self.api_key)
         region = client.get_regions()[3]
         log('Selected region {}'.format(region.id))
-        image = client.get_images()[-2]
+        image = client.get_images()[18]
         log('Selected image {}'.format(image.id))
-        ltype = client.linode.get_types()[8]
+        ltype = client.linode.get_types()[0]
         log('Selected type {}'.format(ltype.id))
 
         log('Creating VPS')
@@ -376,8 +376,8 @@ sudo htpasswd -b /etc/squid/squid_passwd {} {}
                 log('Connected to server')
                 break
             except (paramiko.AuthenticationException, Exception):
-                log('Couldnt connect to host yet. Its probably not started yet. Will retry')
-                sleep(5)
+                log('Couldnt connect to host yet. Its probably not started yet. Will retry in 20s. This is normal.')
+                sleep(20)
         return True
 
     def execute(self):
