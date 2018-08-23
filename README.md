@@ -1,3 +1,7 @@
+**Deprecated**
+
+Seems like it doesnt work anymore. Linode changes their instance indices a lot, which is why it breaks a lot. Shopify has seemed to have patched the 50-in-1 method I was using. They'll ban quickly so just make one proxy per instance. But at that price point, you're better off just buying from a dedicated provider.
+
 **Follow me on Twitter for future updates and other projects: [@edzart](https://twitter.com/edzart)**
 # PyNode
 **Version 0.2**
