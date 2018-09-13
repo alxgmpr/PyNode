@@ -145,10 +145,27 @@ class PyNode(threading.Thread):
 
     def generate_linode(self):
         client = linode.LinodeClient(self.api_key)
-        region = client.get_regions()[3]
+
+        # Thanks to @sweetbabynicco for this suggestion :)
+        for x, y in enumerate(client.get_regions()):
+            log('{} : {}'.format(x, y))
+        log('Please select a region:')
+        try:
+            choice = int(raw_input('> '))
+        except TypeError:
+            log('[error] Non numerical input')
+            choice = 0
+        region = client.get_regions()[choice]
         log('Selected region {}'.format(region.id))
-        image = client.get_images()[18]
+
+        # Ensure the right image selection (ub17.10)
+        for x, y in enumerate(client.get_images()):
+            if '17.10' in str(y):
+                choice = x
+
+        image = client.get_images()[choice]
         log('Selected image {}'.format(image.id))
+
         ltype = client.linode.get_types()[0]
         log('Selected type {}'.format(ltype.id))
 
